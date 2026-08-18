@@ -7,7 +7,7 @@ import json
 import logging
 from typing import Optional
 
-from config import AI_API_KEY, AI_PROVIDER, AI_MODEL, REPORT_LANGUAGE, REPORT_DEPTH
+from config import AI_API_KEY, AI_PROVIDER, AI_MODEL, AI_BASE_URL, REPORT_LANGUAGE, REPORT_DEPTH
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +49,15 @@ def _build_user_prompt(articles_data: list[dict]) -> str:
 请按照系统提示中的要求，生成一份高质量的深度分析日报。"""
 
 
-def generate_report_openai(articles_data: list[dict]) -> str:
-    """使用 OpenAI API 生成日报"""
+def generate_report_openai(articles_data: list[dict], base_url: str = None) -> str:
+    """使用 OpenAI 兼容 API 生成日报（支持 OpenAI / 千问等）"""
     from openai import OpenAI
 
-    client = OpenAI(api_key=AI_API_KEY)
+    kwargs = {"api_key": AI_API_KEY}
+    if base_url:
+        kwargs["base_url"] = base_url
+
+    client = OpenAI(**kwargs)
 
     response = client.chat.completions.create(
         model=AI_MODEL,
@@ -66,6 +70,11 @@ def generate_report_openai(articles_data: list[dict]) -> str:
     )
 
     return response.choices[0].message.content
+
+
+def generate_report_qwen(articles_data: list[dict]) -> str:
+    """使用千问 API 生成日报（通过 OpenAI 兼容接口）"""
+    return generate_report_openai(articles_data, base_url=AI_BASE_URL)
 
 
 def generate_report_anthropic(articles_data: list[dict]) -> str:
@@ -100,6 +109,8 @@ def generate_daily_report(articles: list) -> str:
     try:
         if AI_PROVIDER == "anthropic":
             report = generate_report_anthropic(articles_data)
+        elif AI_PROVIDER == "qwen":
+            report = generate_report_qwen(articles_data)
         else:
             report = generate_report_openai(articles_data)
 

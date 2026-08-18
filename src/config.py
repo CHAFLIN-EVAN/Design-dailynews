@@ -13,8 +13,9 @@ load_dotenv()
 # ============================================================
 PUSHPLUS_TOKEN = os.getenv("PUSHPLUS_TOKEN", "")
 AI_API_KEY = os.getenv("AI_API_KEY", "")
-AI_PROVIDER = os.getenv("AI_PROVIDER", "openai")  # "openai" or "anthropic"
-AI_MODEL = os.getenv("AI_MODEL", "gpt-4o-mini")
+AI_PROVIDER = os.getenv("AI_PROVIDER", "qwen")  # "openai" / "anthropic" / "qwen"
+AI_MODEL = os.getenv("AI_MODEL", "qwen-plus")
+AI_BASE_URL = os.getenv("AI_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
 
 # ============================================================
 # RSS 源列表
