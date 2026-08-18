@@ -26,16 +26,22 @@ RSS_FEEDS = {
     "ux_collective": "https://uxdesign.cc/feed",
     "nngroup": "https://www.nngroup.com/articles/rss.xml",
     "creative_bloc": "https://www.creativebloq.com/feed",
+    "ux_movement": "https://uxmovement.com/feed/",
+    "interaction_design": "https://www.interaction-design.org/rss.xml",
 
     # 工业/产品设计
     "yanko_design": "https://www.yankodesign.com/feed/",
     "core77": "https://www.core77.com/rss",
     "dezeen": "https://www.dezeen.com/feed/",
+    "designboom": "https://www.designboom.com/feed/",
+    "trending_design": "https://www.trendir.com/feed/",
 
     # 平面视觉
     "design_week": "https://www.designweek.co.uk/feed/",
     "its_nice_that": "https://www.itsnicethat.com/feed",
     "brand_identity": "https://thebrandidentity.com/feed/",
+    "logolounge": "https://www.logolounge.com/feed/",
+    "underconsideration": "https://underconsideration.com/brandnew/feed/",
 }
 
 # ============================================================
@@ -45,7 +51,7 @@ SCRAPE_TARGETS = [
     {
         "name": "优设网",
         "url": "https://www.uisdc.com/",
-        "selector": "article h2 a",  # 文章标题链接
+        "selector": "article h2 a",
         "encoding": "utf-8",
     },
     {
@@ -54,13 +60,25 @@ SCRAPE_TARGETS = [
         "selector": ".card-list a.title",
         "encoding": "utf-8",
     },
+    {
+        "name": "UI中国",
+        "url": "https://www.ui.cn/",
+        "selector": ".article-item a.title",
+        "encoding": "utf-8",
+    },
+    {
+        "name": "普象网",
+        "url": "https://www.puxiang.com/",
+        "selector": ".work-item a",
+        "encoding": "utf-8",
+    },
 ]
 
 # ============================================================
 # 日报生成配置
 # ============================================================
 MAX_ARTICLES_PER_SOURCE = 5       # 每个源最多抓取条数
-TOTAL_ARTICLES_FOR_AI = 15        # 送给 AI 整合的文章总数
+TOTAL_ARTICLES_FOR_AI = 25        # 送给 AI 整合的文章总数（增加以确保各类别素材充足）
 REPORT_LANGUAGE = "zh-en-mixed"    # 中英混合
 REPORT_DEPTH = "deep"             # deep / medium / brief
 
