@@ -68,4 +68,4 @@ REPORT_DEPTH = "deep"             # deep / medium / brief
 # 推送配置
 # ============================================================
 PUSH_CHANNEL = "wechat"           # PushPlus 渠道
-PUSH_TEMPLATE = "markdown"        # markdown / html / txt
+PUSH_TEMPLATE = "html"              # html / markdown / txt

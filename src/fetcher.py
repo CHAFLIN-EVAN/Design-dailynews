@@ -38,6 +38,7 @@ class Article:
         category: str,
         summary: str = "",
         published: Optional[datetime] = None,
+        image_url: str = "",
     ):
         self.title = title.strip()
         self.url = url.strip()
@@ -45,6 +46,7 @@ class Article:
         self.category = category
         self.summary = summary.strip()[:500]
         self.published = published
+        self.image_url = image_url.strip()
 
     def __repr__(self):
         return f"<Article: {self.title[:30]}... from {self.source}>"
@@ -57,6 +59,7 @@ class Article:
             "category": self.category,
             "summary": self.summary,
             "published": self.published.isoformat() if self.published else None,
+            "image_url": self.image_url,
         }
 
 
@@ -75,6 +78,47 @@ def _parse_feed_date(date_str: str) -> Optional[datetime]:
     except Exception:
         pass
     return None
+
+
+def _extract_image_from_entry(entry) -> str:
+    """从 RSS entry 中提取图片 URL"""
+    # 1. media_content
+    if hasattr(entry, "media_content"):
+        for media in entry.media_content:
+            url = media.get("url", "")
+            if url and any(ext in url.lower() for ext in [".jpg", ".jpeg", ".png", ".webp", ".gif"]):
+                return url
+            if "image" in media.get("type", ""):
+                return url
+
+    # 2. media_thumbnail
+    if hasattr(entry, "media_thumbnail"):
+        for thumb in entry.media_thumbnail:
+            url = thumb.get("url", "")
+            if url:
+                return url
+
+    # 3. enclosures (common for podcasts but sometimes images)
+    if hasattr(entry, "enclosures"):
+        for enc in entry.enclosures:
+            enc_type = enc.get("type", "")
+            if enc_type.startswith("image"):
+                return enc.get("href", "") or enc.get("url", "")
+
+    # 4. Extract from summary/description HTML
+    content = ""
+    if hasattr(entry, "summary"):
+        content = entry.summary
+    elif hasattr(entry, "description"):
+        content = entry.description
+
+    if content:
+        soup = BeautifulSoup(content, "lxml")
+        img = soup.find("img")
+        if img and img.get("src"):
+            return img["src"]
+
+    return ""
 
 
 def fetch_rss_source(name: str, feed_url: str, category: str = "") -> list[Article]:
@@ -102,6 +146,8 @@ def fetch_rss_source(name: str, feed_url: str, category: str = "") -> list[Artic
                 entry.get("published", "") or entry.get("updated", "")
             )
 
+            image_url = _extract_image_from_entry(entry)
+
             # 从 feed 分类或 URL 推断类别
             feed_category = category
             if not feed_category:
@@ -114,6 +160,7 @@ def fetch_rss_source(name: str, feed_url: str, category: str = "") -> list[Artic
                 category=feed_category,
                 summary=summary,
                 published=published,
+                image_url=image_url,
             ))
 
         logger.info(f"[RSS] {name}: 获取 {len(articles)} 篇文章")
@@ -151,6 +198,38 @@ def fetch_all_rss() -> list[Article]:
 # 网页爬取
 # ============================================================
 
+def _extract_image_from_page(url: str) -> str:
+    """从文章页面提取主图（og:image）"""
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=8)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "lxml")
+
+        # 优先 og:image
+        og_image = soup.find("meta", property="og:image")
+        if og_image and og_image.get("content"):
+            return og_image["content"]
+
+        # 其次 twitter:image
+        twitter_image = soup.find("meta", attrs={"name": "twitter:image"})
+        if twitter_image and twitter_image.get("content"):
+            return twitter_image["content"]
+
+        # 最后取文章内第一张图
+        article = soup.find("article") or soup.find("main") or soup
+        img = article.find("img")
+        if img and img.get("src"):
+            src = img["src"]
+            if src.startswith("/"):
+                from urllib.parse import urljoin
+                src = urljoin(url, src)
+            return src
+
+    except Exception:
+        pass
+    return ""
+
+
 def scrape_source(target: dict) -> list[Article]:
     """爬取单个网站"""
     articles = []
@@ -182,12 +261,16 @@ def scrape_source(target: dict) -> list[Article]:
             if not link.startswith("http"):
                 continue
 
+            # 提取文章配图
+            image_url = _extract_image_from_page(link)
+
             articles.append(Article(
                 title=title,
                 url=link,
                 source=name,
                 category="中文设计",
                 summary="",
+                image_url=image_url,
             ))
 
         logger.info(f"[爬取] {name}: 获取 {len(articles)} 篇文章")

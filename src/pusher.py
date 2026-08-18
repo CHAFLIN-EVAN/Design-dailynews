@@ -20,7 +20,7 @@ def push_to_wechat(title: str, content: str) -> bool:
 
     Args:
         title: 消息标题
-        content: 消息内容（Markdown 格式）
+        content: 消息内容（HTML 格式）
 
     Returns:
         bool: 是否推送成功
@@ -66,7 +66,7 @@ def send_daily_report(report: str, date_str: str = "") -> bool:
     发送设计日报到微信
 
     Args:
-        report: Markdown 格式的日报内容
+        report: HTML 格式的日报内容
         date_str: 日期字符串（用于标题），如 "2026年08月18日"
 
     Returns:
