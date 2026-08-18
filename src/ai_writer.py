@@ -382,6 +382,76 @@ def _render_html(data: dict, date_str: str) -> str:
     color: #8b8b9e;
   }}
   .footer a {{ color: #0f3460; text-decoration: none; }}
+
+  /* Responsive - 小屏手机优化 */
+  @media screen and (max-width: 480px) {{
+    .container {{ padding: 12px 8px; }}
+    .header {{ padding: 28px 16px 24px; border-radius: 12px; }}
+    .header h1 {{ font-size: 24px; }}
+    .section-title {{ font-size: 18px; }}
+    .headline-card .card-title {{ font-size: 17px; }}
+    .headline-card .card-content {{ padding: 16px; }}
+    .card .card-image {{ width: 110px; min-width: 110px; }}
+    .card .card-content {{ padding: 12px; }}
+    .card-title {{ font-size: 14px; }}
+    .card-analysis {{ font-size: 12px; }}
+    .editorial {{ padding: 20px 16px; }}
+  }}
+
+  /* 超小屏适配 */
+  @media screen and (max-width: 360px) {{
+    .card {{ flex-direction: column; }}
+    .card .card-image {{ width: 100%; height: 160px; }}
+    .header h1 {{ font-size: 22px; }}
+  }}
+
+  /* 深色模式适配 */
+  @media (prefers-color-scheme: dark) {{
+    body {{
+      background: #0d0d14;
+      color: #e8e8ed;
+    }}
+    .header {{
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 50%, #16213e 100%);
+      border: 1px solid rgba(255,255,255,0.05);
+    }}
+    .headline-card, .card {{
+      background: #1a1a24;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+    }}
+    .headline-card:hover, .card:hover {{
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
+    }}
+    .section-title {{
+      border-bottom-color: #2a2a3a;
+      color: #e8e8ed;
+    }}
+    .card-title a {{
+      color: #e8e8ed;
+    }}
+    .card-title a:hover {{ color: #6ab0f3; }}
+    .card-analysis {{
+      color: #a0a0b0;
+    }}
+    .source {{
+      color: #6a6a7a;
+    }}
+    .category-tag {{
+      background: #1a2a3a;
+      color: #6ab0f3;
+    }}
+    .card .card-image, .headline-card .card-image {{
+      background-color: #2a2a3a;
+    }}
+    .editorial {{
+      background: linear-gradient(135deg, #16213e 0%, #0f1a2e 100%);
+      border: 1px solid rgba(255,255,255,0.05);
+    }}
+    .footer {{
+      color: #6a6a7a;
+    }}
+    .footer a {{ color: #6ab0f3; }}
+  }}
 </style>
 </head>
 <body>
